@@ -1,0 +1,50 @@
+local Object = {}
+Object.__index = Object
+
+function Object.new(Classname,Parent,Properties)
+	local s,part = pcall(function()
+		return Instance.new(Classname)
+	end)
+	if s and part then
+		
+		for Property,Value in pairs(Properties) do
+			if part[Property] then
+				part[Property] = Value
+			end
+		end
+		part.Parent = Parent
+		return part
+	else
+		return nil
+	end
+end
+
+function Object:ChangeProperties(Properties)
+	local s1
+	for i,v in pairs(Properties) do
+		s1 = pcall(function() 
+			self[i] = v
+		end) 
+		if not s1 then
+			error('Invalid Property or Key used. Key data: '..i..', '..v)
+		end
+	end
+	return true 
+end
+
+function Object:lerpProperty(Property,NumberOfIts,Numbertogo)
+	local Lerpable = {'CFrame','Vector3','Color3'}
+	if Lerpable[typeof(Property)] then
+		for i = 1,NumberOfIts do
+			self[Property]:lerp(Numbertogo,i/NumberOfIts)
+		end
+	elseif typeof(Property) == 'number' then
+		local Differential = (self[Property] - Numbertogo)/NumberOfIts
+		for i = 1,NumberOfIts do
+			self[Property] = self[Property] + Differential
+		end
+	else
+		error('Invalid Property type.')	
+	end	
+end
+return Object
